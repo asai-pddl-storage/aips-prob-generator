@@ -1,4 +1,4 @@
-(in-package "PDDL")
+(in-package :aips-prob-generator)
 
 (defvar *shapes* '(triangle diamond square circle))
 (defvar *r_lock* 10)

@@ -1,6 +1,6 @@
-(defpackage pddl
+(defpackage :aips-prob-generator
   (:use :cl))
-(in-package "PDDL")
+(in-package :aips-prob-generator)
 
 (defvar rightcol* 60)
 
@@ -60,7 +60,6 @@
                                 (values r ty))))))))
       (cdr-down obl)))
 
-(declaim (special *print-case*))
 
 ; This prints an sexp defining a problem
 (defun prob-print (prob srm)

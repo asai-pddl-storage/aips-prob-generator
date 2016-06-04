@@ -1,4 +1,4 @@
-(in-package "PDDL")
+(in-package :aips-prob-generator)
 
 (defstruct (pt (:type list)
 	       (:constructor pt (x y)))

@@ -8,9 +8,7 @@ exec ros -Q -- $0 "$@"
   (ql:register-local-projects)
   (ql:quickload :aips-prob-generator))
 
-(defpackage :ros.script.all-gen.ros.3674072503
-  (:use :cl))
-(in-package :ros.script.all-gen.ros.3674072503)
+(in-package :aips-prob-generator)
 
 (defun main (&rest argv)
   (declare (ignorable argv))

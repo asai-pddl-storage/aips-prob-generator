@@ -1,4 +1,4 @@
-(in-package "PDDL")
+(in-package :aips-prob-generator)
 
 (defun logistics-prob (name npackages ncities nplanes ntrucks
                        locs-per-city ngoals)

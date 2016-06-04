@@ -1,26 +1,25 @@
-(in-package "PDDL")
+(in-package :aips-prob-generator)
 
-(declaim (special *print-case*))
 
 (defun all-gen ()
    (format t "Movie ...")
-   (movie-probgen "movie"
+   (movie-probgen "movie/"
                   "MOVIE-X" 0 30 5 1)
    (format t "~%Gripper...")
-   (gripper-probgen "gripper"
+   (gripper-probgen "gripper/"
                     "GRIPPER-X" 0 20 2 1)
    (format t "~%Logistics...")
-   (logistics-probgen "logistics"
+   (logistics-probgen "logistics/"
                       "LOG-X" 0 30 8 2)
    (format t "~%Mystery...")
-   (mystery-probgen "mystery"
+   (mystery-probgen "mystery/"
                     "MYSTY-X" 0 30 10 0.5)
    (format t "~%Assembly...")
-   (assembly-probgen "assembly"
+   (assembly-probgen "assembly/"
                      "ASSEM-X" 0 30 20 2))
 
-(defun movie-probgen (filename name-prefix name-zero num size inc)
-   (probgen filename name-prefix name-zero num size inc
+(defun movie-probgen (dirname name-prefix name-zero num size inc)
+   (probgen dirname name-prefix name-zero num size inc
       #'(lambda (name size)
            (setq size (ceiling size))
            `(define (problem ,name)
@@ -39,8 +38,8 @@
                            (have-cheese) (have-crackers)))))))
 
 
-(defun gripper-probgen (filename name-prefix name-zero num size inc)
-   (probgen filename name-prefix name-zero num size inc
+(defun gripper-probgen (dirname name-prefix name-zero num size inc)
+   (probgen dirname name-prefix name-zero num size inc
       #'(lambda (name size)
            (setq size (* 2 (ceiling size)))
            ; odd-numbered sizes are not interesting (?)
@@ -59,8 +58,8 @@
                                              `(at ,b roomB))
                                         balls))))))))
 
-(defun logistics-probgen (filename name-prefix name-zero num size inc)
-   (probgen filename name-prefix name-zero num size inc
+(defun logistics-probgen (dirname name-prefix name-zero num size inc)
+   (probgen dirname name-prefix name-zero num size inc
       #'(lambda (name size)
            (setq size (ceiling size))
            (logistics-prob name
@@ -71,8 +70,8 @@
                            (+ 2 (random (ceiling size 4)))
                            (+ 3 (random size))))))
 
-(defun mystery-probgen (filename name-prefix name-zero num size inc)
-   (probgen filename name-prefix name-zero num size inc
+(defun mystery-probgen (dirname name-prefix name-zero num size inc)
+   (probgen dirname name-prefix name-zero num size inc
       #'(lambda (name size)
               (random-mystery-prob
                            :name name
@@ -89,8 +88,8 @@
                            :numgoals (max 1 (random (floor size 3)))
                            :clumpprob (+ 0.2 (random 0.8))))))
 
-(defun assembly-probgen (filename name-prefix name-zero num size inc)
-   (probgen filename name-prefix name-zero num size inc
+(defun assembly-probgen (dirname name-prefix name-zero num size inc)
+   (probgen dirname name-prefix name-zero num size inc
       #'(lambda (name size)
               (random-assembly-prob
                            name
@@ -99,24 +98,26 @@
                            0.8))))
 
 ; size and inc may be floats.  generator must anticipate that possibility.
-(defun probgen (filename name-prefix name-zero num size inc
+(defun probgen (dirname name-prefix name-zero num size inc
                 generator)
-   (let ((*print-case* ':downcase))
-     (dotimes (k num)
-       (with-open-file (outsrm (format nil "~a/p~2,,,0@a.pddl" filename k)
-                               :direction ':output
-                               :if-does-not-exist ':create
-                               :if-exists ':supersede)
-         (format t (cond (random-graph-dbg* "~% ** ~s ** ~%")
-                         (t "~s "))
-                 (+ k 1))
-         (prob-print
-          (funcall generator (prob-sym name-prefix (+ name-zero k 1))
-                   size)
-          outsrm)
-         (format outsrm "~%~%")
-         (setq size (+ size inc))))))
+  (ensure-directories-exist dirname)
+  (let ((*print-case* ':downcase))
+    (dotimes (k num)
+      (with-open-file (outsrm (merge-pathnames (format nil "p~2,,,'0@a.pddl" (1+ k)) dirname)
+                              :direction :output
+                              :if-does-not-exist :create
+                              :if-exists :supersede)
+        (format t (cond (random-graph-dbg* "~% ** ~s ** ~%")
+                        (t "~s "))
+                (+ k 1))
+        (prob-print
+         (funcall generator (prob-sym name-prefix (+ name-zero k 1))
+                  size)
+         outsrm)
+        (format outsrm "~%~%")
+        (setq size (+ size inc))))))
 
+#+nil
 (defun prob-file-stripsify (infile outfile domname type-table extra-inits)
    (with-open-file (insrm infile
                           :direction ':input)
@@ -131,6 +132,7 @@
                       (prob-print r outsrm)
                       (format outsrm "~%~%"))))))))
 
+#+nil
 (defun prob-file-split (filename target num &optional (probfile-digits 2))
    (setq target (pathname target))
    (let ((fk num) (r nil))
