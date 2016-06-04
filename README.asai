@@ -1,0 +1,14 @@
+
+install ROSWELL from here: https://github.com/roswell/roswell
+
+ Mac OS X + Homebrew --- use the custom tap
+
+$ brew tap roswell/roswell
+$ brew install roswell
+
+then
+
+$ ./all-gen.ros
+
+configure parameters in probgen.lisp
+
